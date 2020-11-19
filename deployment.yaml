@@ -1,0 +1,48 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: flink-jobmanager
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: flink
+        component: jobmanager
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: hangout-select
+                    operator: In
+                    values:
+                      - k8s-hangout
+      imagePullSecrets:
+        - name: docker-registry
+      containers:
+        - name: jobmanager
+          image: hub.xesv5.com/wangxiao-jichujiagou-common/flink-on-kubernetes-online:1.9.0
+          imagePullPolicy: Always
+          workingDir: /opt/flink
+          command: ["/bin/bash", "-c", "/usr/local/bin/gohangout --config /etc/gohangout/conf.d/hangout.yaml -v 5 -pprof=true -pprof-address 0.0.0.0:8899 --worker 8 --logtostderr"]
+          ports:
+            - containerPort: 8899
+              name: prof
+          securityContext: {}
+          livenessProbe:
+            tcpSocket:
+              port: 6123
+            initialDelaySeconds: 30
+            periodSeconds: 60
+          volumeMounts:
+            - name: hangout-config-volume
+              mountPath: /etc/gohangout/conf.d
+      volumes:
+        - name: hangout-conf
+          configMap:
+            name: hangout-conf
+            items:
+              - key: hangout.yaml
+                path: hangout.yaml
