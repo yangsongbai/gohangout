@@ -2,6 +2,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: hangout
+  namespace: default
 spec:
   replicas: 1
   template:
@@ -22,20 +23,15 @@ spec:
       imagePullSecrets:
         - name: docker-registry
       containers:
-        - name: jobmanager
-          image: :1.9.0
+        - name: gohangout
+          image: /gohangout:v1.1.1
           imagePullPolicy: Always
-          workingDir: /opt/flink
-          command: ["/bin/bash", "-c", "/usr/local/bin/gohangout --config /etc/gohangout/conf.d/hangout.yaml -v 5 -pprof=true -pprof-address 0.0.0.0:8899 --worker 8 --logtostderr"]
+          workingDir: /etc/gohangout/
+          command: ["/bin/bash", "-c", "/opt/gohangout/gohangout --config /etc/gohangout/conf.d/hangout.yaml -v 5 -pprof=true -pprof-address 0.0.0.0:8899 --worker 8 --logtostderr"]
           ports:
             - containerPort: 8899
               name: prof
           securityContext: {}
-          livenessProbe:
-            tcpSocket:
-              port: 6123
-            initialDelaySeconds: 30
-            periodSeconds: 60
           volumeMounts:
             - name: hangout-config-volume
               mountPath: /etc/gohangout/conf.d
