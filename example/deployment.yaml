@@ -44,12 +44,12 @@ spec:
               memory: 64Mi
           securityContext: {}
           volumeMounts:
-            - name: hangout-config-volume
+            - name: hangout-conf
               mountPath: /etc/gohangout/conf.d
       volumes:
-        - name: hangout-conf
-          configMap:
-            name: hangout-conf
-            items:
-              - key: hangout.yaml
-                path: hangout.yaml
+      - name: hangout-conf
+        configMap:
+          name: hangout-conf
+          items:
+            - key: hangout.yaml
+              path: hangout.yaml

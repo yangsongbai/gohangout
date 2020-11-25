@@ -1,7 +1,6 @@
-FROM alpine:3.8
-ARG TZ="Asia/Shanghai"
-ENV TZ ${TZ}
-RUN apk upgrade --update && apk add bash tzdata curl && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime
+FROM centos:centos7.4.1708
+RUN yum -y install vim
+RUN yum -y install net-tools
 RUN mkdir -p /opt/gohangout
 RUN mkdir -p /etc/gohangout/conf.d/
 ADD gohangout /opt/gohangout/
